@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 C&C Locket Remote</title>
+</head>
+<body style="background:#121212; color:#fff; font-family:sans-serif; padding:20px; text-align:center;">
+    <h2 style="color:#00e676;">🎯 Kích Hoạt Mục Tiêu</h2>
+    <p style="font-size:13px; color:#aaa;">Copy link Celeb (có chứa invites/...) dán vào đây:</p>
+    
+    <input type="text" id="linkInput" style="width:100%; padding:15px; box-sizing:border-box; border-radius:8px; border:1px solid #333; background:#222; color:#fff; margin-bottom:15px; font-size:14px;" placeholder="https://locket.cam/invites/...">
+    
+    <input type="text" id="nameInput" style="width:100%; padding:15px; box-sizing:border-box; border-radius:8px; border:1px solid #333; background:#222; color:#fff; margin-bottom:15px; font-size:14px;" placeholder="Tên Celeb (Để trống nó tự hiểu)">
+    
+    <button onclick="sendTarget()" style="width:100%; padding:15px; background:#2481cc; color:white; font-weight:bold; border:none; border-radius:8px; font-size:16px;">🚀 BẮN LỆNH VỀ PC</button>
+    
+    <div id="msg" style="margin-top:20px; font-size:14px; font-weight:bold; line-height: 1.5;"></div>
+    
+    <script>
+        async function sendTarget() {
+            const link = document.getElementById('linkInput').value.trim();
+            const name = document.getElementById('nameInput').value.trim() || 'Lệnh_Từ_Đt';
+            const msg = document.getElementById('msg');
+            
+            // Xén lấy đúng cái UID 28 ký tự
+            const uidMatch = link.match(/invites\/([A-Za-z0-9_-]{28})/);
+            if (!uidMatch || !uidMatch[1]) return msg.innerHTML = '<span style="color:#ff4444;">❌ Link không hợp lệ! Vui lòng dùng link invite.</span>';
+            
+            const uid = uidMatch[1];
+            msg.innerHTML = '<span style="color:#FFD700;">⏳ Đang truyền lệnh lên Đám mây...</span>';
+            
+            const FIREBASE_URL = `https://locket-tool-api-default-rtdb.asia-southeast1.firebasedatabase.app/celebs/${uid}.json`;
+            try {
+                await fetch(FIREBASE_URL, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ uid: uid, username: name })
+                });
+                msg.innerHTML = `<span style="color:#00e676;">✅ Đã bắn lệnh UID: ${uid.substring(0,8)}...<br>PC ở nhà sẽ tự động khai hỏa trong vòng 30 giây!</span>`;
+                document.getElementById('linkInput').value = "";
+                document.getElementById('nameInput').value = "";
+            } catch(e) {
+                msg.innerHTML = '<span style="color:#ff4444;">❌ Lỗi mạng: ' + e.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>
