@@ -10,30 +10,37 @@
     
     <input type="text" id="linkInput" style="width:100%; padding:15px; box-sizing:border-box; border-radius:8px; border:1px solid #333; background:#222; color:#fff; margin-bottom:15px; font-size:15px;" placeholder="@isaac.lion hoặc dán link...">
     
+    <div style="margin-bottom: 20px; text-align: left; padding-left: 5px;">
+        <label style="color: #FFD700; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+            <input type="checkbox" id="autoScanCheck" checked style="width: 18px; height: 18px; cursor: pointer;"> 
+            🔥 Kích hoạt quét luôn trên PC ở nhà
+        </label>
+    </div>
+    
     <button onclick="sendTarget()" style="width:100%; padding:15px; background:#2481cc; color:white; font-weight:bold; border:none; border-radius:8px; font-size:16px;">🚀 KHAI HỎA PC</button>
     
-    <div id="msg" style="margin-top:20px; font-size:14px; font-weight:bold;"></div>
+    <div id="msg" style="margin-top:20px; font-size:14px; font-weight:bold; line-height: 1.5;"></div>
     
     <script>
         async function sendTarget() {
             const rawInput = document.getElementById('linkInput').value.trim();
+            const autoScan = document.getElementById('autoScanCheck').checked;
             const msg = document.getElementById('msg');
             
             if (!rawInput) return msg.innerHTML = '<span style="color:#ff4444;">❌ Vui lòng nhập thông tin!</span>';
             msg.innerHTML = '<span style="color:#FFD700;">⏳ Đang truyền lệnh về PC...</span>';
             
-            // Tạo một ID tạm thời (Ví dụ: cmd_1678129381)
             const tempId = "cmd_" + Date.now();
             const FIREBASE_URL = `https://locket-tool-api-default-rtdb.asia-southeast1.firebasedatabase.app/celebs/${tempId}.json`;
             
             try {
-                // Đẩy chuỗi gốc (rawInput) lên cho PC tự nhai
+                // Đẩy chuỗi kèm cờ quyết định quét luôn (autoScan) lên mây
                 await fetch(FIREBASE_URL, { 
                     method: 'PUT', 
                     headers: { 'Content-Type': 'application/json' }, 
-                    body: JSON.stringify({ isRawCommand: true, rawInput: rawInput }) 
+                    body: JSON.stringify({ isRawCommand: true, rawInput: rawInput, autoScan: autoScan }) 
                 });
-                msg.innerHTML = `<span style="color:#00e676;">✅ Đã bắn lệnh! PC đang tự động phân tích và khai hỏa!</span>`;
+                msg.innerHTML = `<span style="color:#00e676;">✅ Đã bắn lệnh!<br>${autoScan ? 'PC ở nhà đang tự động bóc tách và VÀO VIỆC LUÔN!' : 'Đã thêm vào danh sách chờ trên PC!'}</span>`;
                 document.getElementById('linkInput').value = ""; 
             } catch(e) { 
                 msg.innerHTML = '<span style="color:#ff4444;">❌ Lỗi mạng: ' + e.message + '</span>'; 
